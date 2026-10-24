@@ -19,15 +19,20 @@ def strictly_decreasing(docs):
     return {d: float(len(ranked) - i) for i, d in enumerate(ranked)}
 
 
-def evaluate(run, qrels):
+def topic_scores(run, qrels):
     """run, qrels: {qid: {doc_id: score or rel}} for ONE domain and split.
 
-    -> {bucket: {"nDCG@10": mean, ..., "n": topics}}. Every topic in qrels is scored;
-    one missing from the run counts as 0. Ranking = score descending, ties keep the run's own
-    order (pytrec alone would break ties by doc id, which leaks relevance).
+    -> {qid: {"ndcg_cut_10": x, ...}} for every topic in qrels; one missing from the run
+    counts as 0. Ranking = score descending, ties keep the run's own order (pytrec alone
+    would break ties by doc id, which leaks relevance).
     """
     evaluator = pytrec_eval.RelevanceEvaluator(qrels, {"ndcg_cut.10", "map_cut.10", "recall.10", "recip_rank"})
-    per_topic = evaluator.evaluate({qid: strictly_decreasing(run.get(qid, {})) for qid in qrels})
+    return evaluator.evaluate({qid: strictly_decreasing(run.get(qid, {})) for qid in qrels})
+
+
+def evaluate(run, qrels):
+    """-> {bucket: {"nDCG@10": mean, ..., "n": topics}} over topic_scores(run, qrels)."""
+    per_topic = topic_scores(run, qrels)
 
     groups = defaultdict(list)
     for qid, scores in per_topic.items():

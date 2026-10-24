@@ -2,10 +2,12 @@
 
     uv run python scripts/bm25_baseline.py
 
-Writes run files to results/runs/<domain>/<split>_bm25-<variant>.run (git-ignored) and the
-tables to results/bm25/baseline.md.
+Writes run files to results/runs/<domain>/<split>_bm25-<variant>.run (git-ignored), the
+tables to results/bm25/baseline.md and the plot to results/bm25/ndcg_by_depth.png.
 """
 import time
+
+import matplotlib.pyplot as plt
 
 from semeval_reteco.bm25 import Bm25, run_bm25
 from semeval_reteco.config import DOMAINS, ROOT, SPLITS
@@ -15,9 +17,27 @@ from semeval_reteco.queries import VARIANTS
 
 RUNS_DIR = ROOT / "results" / "runs"
 OUT = ROOT / "results" / "bm25" / "baseline.md"
+PLOT = ROOT / "results" / "bm25" / "ndcg_by_depth.png"
 
 # history and last2 use the dataset's gold answers (rule R4)
 NOTE = {"current": "current", "qonly": "q-only", "last2": "last2 (gold answers)", "history": "history (gold answers)"}
+
+
+def plot_by_depth(results):
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
+    for ax, split in zip(axes, ("dev", "train")):
+        for variant in VARIANTS:
+            ys = [macro(results[variant, split], b)["nDCG@10"] for b in BUCKETS[1:]]
+            ax.plot(BUCKETS[1:], ys, marker="o", linestyle="--" if variant in ("last2", "history") else "-",
+                label=NOTE[variant])
+        ax.set_title(f"BM25, {split} (macro over 11 domains)")
+        ax.set_xlabel("turn depth")
+        ax.grid(alpha=0.3)
+    axes[0].set_ylabel("nDCG@10")
+    fig.legend(*axes[0].get_legend_handles_labels(), loc="lower center", ncol=len(VARIANTS))
+    fig.tight_layout(rect=(0, 0.08, 1, 1))
+    PLOT.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(PLOT, dpi=150)
 
 
 def main():
@@ -57,6 +77,7 @@ def main():
             row = [macro(results[variant, split], b)["nDCG@10"] for b in BUCKETS]
             lines.append(f"| {NOTE[variant]} | " + " | ".join(f"{x:.4f}" for x in row) + " |")
 
+    plot_by_depth(results)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
