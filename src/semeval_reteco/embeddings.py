@@ -1,4 +1,5 @@
 import json
+import faiss
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
@@ -50,3 +51,30 @@ def encode_corpus(model_name, domain, device=None, batch_size=64):
     tmp_ids.rename(ids_path)
 
     return npy_path
+
+_index_cache = {}
+
+
+def load_index(model_name, domain):
+    key = (model_name, domain)
+    if key not in _index_cache:
+        vectors = np.load(EMB_DIR / model_name / f"{domain}.npy")
+        vectors = vectors.astype(np.float32)
+        with open(EMB_DIR / model_name / f"{domain}.ids.json", encoding="utf-8") as f:
+            doc_ids = json.load(f)
+
+        index = faiss.IndexFlatIP(vectors.shape[1])
+        index.add(vectors)
+        _index_cache[key] = (index, doc_ids)
+    return _index_cache[key]
+
+
+def search(model_name, domain, query_vecs, k=100):
+    index, doc_ids = load_index(model_name, domain)
+    query_vecs = np.asarray(query_vecs, dtype=np.float32)
+    scores, rows = index.search(query_vecs, k)
+
+    result_ids = []
+    for row_list in rows:
+        result_ids.append([doc_ids[r] for r in row_list])
+    return result_ids, scores
