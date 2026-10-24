@@ -1,0 +1,76 @@
+biology
+  documents: 57359
+  train turns: 247
+  dev turns: 115
+  gold docs per turn: 1.49
+drones
+  documents: 16381
+  train turns: 104
+  dev turns: 38
+  gold docs per turn: 2.18
+earth_science
+  documents: 121249
+  train turns: 321
+  dev turns: 133
+  gold docs per turn: 1.67
+economics
+  documents: 50220
+  train turns: 196
+  dev turns: 92
+  gold docs per turn: 2.53
+hardware
+  documents: 26308
+  train turns: 130
+  dev turns: 58
+  gold docs per turn: 2.16
+law
+  documents: 20027
+  train turns: 164
+  dev turns: 66
+  gold docs per turn: 2.69
+medicalsciences
+  documents: 23297
+  train turns: 139
+  dev turns: 44
+  gold docs per turn: 2.19
+politics
+  documents: 16712
+  train turns: 159
+  dev turns: 54
+  gold docs per turn: 2.42
+psychology
+  documents: 52835
+  train turns: 234
+  dev turns: 99
+  gold docs per turn: 2.26
+robotics
+  documents: 61961
+  train turns: 184
+  dev turns: 75
+  gold docs per turn: 1.68
+sustainable_living
+  documents: 60792
+  train turns: 235
+  dev turns: 84
+  gold docs per turn: 1.78
+
+Turn depth:
+train {1: 496, 2: 496, 3: 496, 4: 290, 5: 335}
+dev {1: 211, 2: 211, 3: 211, 4: 121, 5: 104}
+
+Query length in tokens (MiniLM tokenizer), train:
+current depth 1 -> mean: 25 -> over 256: 0% -> over 512: 0%
+current depth 2 -> mean: 23 -> over 256: 0% -> over 512: 0%
+current depth 3 -> mean: 23 -> over 256: 0% -> over 512: 0%
+current depth 4 -> mean: 23 -> over 256: 0% -> over 512: 0%
+current depth 5 -> mean: 23 -> over 256: 0% -> over 512: 0%
+qonly depth 1 -> mean: 28 -> over 256: 0% -> over 512: 0%
+qonly depth 2 -> mean: 51 -> over 256: 0% -> over 512: 0%
+qonly depth 3 -> mean: 74 -> over 256: 0% -> over 512: 0%
+qonly depth 4 -> mean: 98 -> over 256: 0% -> over 512: 0%
+qonly depth 5 -> mean: 147 -> over 256: 1% -> over 512: 0%
+history depth 1 -> mean: 32 -> over 256: 0% -> over 512: 0%
+history depth 2 -> mean: 141 -> over 256: 0% -> over 512: 0%
+history depth 3 -> mean: 252 -> over 256: 42% -> over 512: 0%
+history depth 4 -> mean: 367 -> over 256: 100% -> over 512: 0%
+history depth 5 -> mean: 487 -> over 256: 100% -> over 512: 38%
