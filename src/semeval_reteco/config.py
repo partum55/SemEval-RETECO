@@ -7,3 +7,5 @@ DOMAINS = ("biology", "drones", "earth_science", "economics", "hardware", "law",
     "medicalsciences", "politics", "psychology", "robotics", "sustainable_living")
 
 SPLITS = ("train", "dev")
+
+EMB_DIR = ROOT / "data" / "emb"
