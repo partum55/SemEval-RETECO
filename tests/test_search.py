@@ -1,3 +1,4 @@
+import faiss
 import random
 
 from sentence_transformers import SentenceTransformer
