@@ -4,16 +4,16 @@
 
 ## Macro average over domains
 
-| split | variant | nDCG@10 | MAP@10 | Recall@10 | MRR |
-|---|---|---|---|---|---|
-| dev | current | 0.1819 | 0.1353 | 0.2782 | 0.1844 |
-| dev | q-only | 0.2921 | 0.2273 | 0.4205 | 0.2944 |
-| dev | last2 (gold answers) | 0.4341 | 0.3577 | 0.5577 | 0.4601 |
-| dev | history (gold answers) | 0.4377 | 0.3610 | 0.5639 | 0.4613 |
-| train | current | 0.1846 | 0.1369 | 0.2787 | 0.1906 |
-| train | q-only | 0.2993 | 0.2338 | 0.4246 | 0.3070 |
-| train | last2 (gold answers) | 0.4438 | 0.3645 | 0.5782 | 0.4622 |
-| train | history (gold answers) | 0.4543 | 0.3740 | 0.5918 | 0.4692 |
+| split | variant | nDCG@10 | MAP@10 | Recall@10 | Recall@100 | MRR |
+|---|---|---|---|---|---|---|
+| dev | current | 0.1819 | 0.1353 | 0.2782 | 0.5551 | 0.1844 |
+| dev | q-only | 0.2921 | 0.2273 | 0.4205 | 0.7302 | 0.2944 |
+| dev | last2 (gold answers) | 0.4341 | 0.3577 | 0.5577 | 0.8119 | 0.4601 |
+| dev | history (gold answers) | 0.4377 | 0.3610 | 0.5639 | 0.8240 | 0.4613 |
+| train | current | 0.1846 | 0.1369 | 0.2787 | 0.5460 | 0.1906 |
+| train | q-only | 0.2993 | 0.2338 | 0.4246 | 0.7401 | 0.3070 |
+| train | last2 (gold answers) | 0.4438 | 0.3645 | 0.5782 | 0.8179 | 0.4622 |
+| train | history (gold answers) | 0.4543 | 0.3740 | 0.5918 | 0.8286 | 0.4692 |
 
 ## nDCG@10 per domain, dev
 
