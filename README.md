@@ -1,4 +1,4 @@
-# SemEval-2027 RETECO: finding documents in multi-turn conversations
+# SemEval-2027 RETECO: Reasoning-Oriented Retrieval
 
 UCU "Artificial Intelligence" course project on [SemEval-2027 RETECO](https://github.com/DataScienceUIBK/RETECO),
 Track 2 (RECOR data).
