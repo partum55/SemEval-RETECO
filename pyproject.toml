@@ -1,7 +1,7 @@
 [project]
 name = "semeval-reteco"
 version = "0.1.0"
-description = "Add your description here"
+description = "BM25 and dense retrieval baselines for SemEval-2027 RETECO Track 2 (multi-turn conversational retrieval)"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -14,11 +14,19 @@ dependencies = [
     "pystemmer>=3.1.0",
     "pytrec-eval-terrier>=0.5.11",
     "sentence-transformers>=6.2.0",
+    "torch>=2.14.1",
     "transformers>=5.20.2",
 ]
 
-[project.scripts]
-semeval-reteco = "semeval_reteco:main"
+# PyPI only has CPU-only torch for Windows; take the CUDA build there so query encoding runs
+# on an NVIDIA GPU. cu126 works with drivers >= 527. macOS and Linux keep the PyPI wheels.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu126", marker = "sys_platform == 'win32'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
 
 [build-system]
 requires = ["uv_build>=0.13.5,<0.14.0"]
@@ -29,3 +37,10 @@ dev = [
     "pytest>=9.1.1",
     "ruff>=0.17.2",
 ]
+
+# uv run ruff check   (pycodestyle errors/warnings, pyflakes, import order)
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I"]

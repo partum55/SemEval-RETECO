@@ -14,10 +14,9 @@ def test_analyzer_matches_the_official_one():
 
 
 def test_analyzer_keeps_one_letter_tokens_and_drops_possessive_s():
-    assert analyze(["a x y drone's"]) == [["x", "y", "drone"]]  # "a" is a stopword
+    assert analyze(["a x y drone's"]) == [["x", "y", "drone"]]
 
 
-# Official starter-kit BASELINE_RESULTS.md, drones dev, official BM25 (nDCG@10).
 @needs_data
 @pytest.mark.parametrize("variant, expected", [("current", 0.1695), ("history", 0.2954)])
 def test_drones_dev_matches_official_baseline(variant, expected):

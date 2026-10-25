@@ -1,9 +1,14 @@
 import random
 
+import pytest
 from sentence_transformers import SentenceTransformer
 
+from semeval_reteco.config import DATA_DIR, EMB_DIR
 from semeval_reteco.data import load_corpus
 from semeval_reteco.embeddings import ENCODERS, search
+
+pytestmark = pytest.mark.skipif(not (DATA_DIR.exists() and EMB_DIR.exists()),
+    reason="data or embeddings not downloaded")
 
 
 def check_model(model_name):
