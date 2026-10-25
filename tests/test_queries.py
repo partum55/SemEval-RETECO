@@ -52,11 +52,38 @@ def test_recent_first_puts_the_newest_turn_first():
     assert text.index("Q: q2") < text.index("Q: q1")
     text = build_query(make_turn(2), "history", recent_first=True)
     assert text.index("Q: q2") < text.index("Q: q1")
-    assert "A: a1" in text  # pairs stay together
+    assert "A: a1" in text
+
+
+def test_window_keeps_the_last_turns():
+    assert build_query(make_turn(3), "qonly", window=2) == "current question" + LABEL + "Q: q2\nQ: q3"
+    assert build_query(make_turn(3), "history", window=1) == "current question" + LABEL + "Q: q3\nA: a3"
+    turn = make_turn(3)
+    assert build_query(turn, "history", window=5) == "current question" + LABEL + turn["gold_history"]
+
+
+def test_window_with_recent_first_keeps_the_newest_turns_first():
+    text = build_query(make_turn(3), "qonly", recent_first=True, window=2)
+    assert text == "current question" + LABEL + "Q: q3\nQ: q2"
+
+
+def test_rebuild_uses_all_earlier_turns_instead_of_the_dataset_field():
+    turn = make_turn(3)
+    turn["gold_history"] = "Q: q2\nA: a2\nQ: q3\nA: a3"
+    rebuilt = build_query(turn, "history", rebuild=True)
+    assert rebuilt == "current question" + LABEL + "Q: q1\nA: a1\nQ: q2\nA: a2\nQ: q3\nA: a3"
+    newest = build_query(turn, "history", recent_first=True)
+    assert newest == "current question" + LABEL + "Q: q3\nA: a3\nQ: q2\nA: a2\nQ: q1\nA: a1"
+    assert build_query(turn, "qonly", rebuild=True) == build_query(turn, "qonly")
+
+
+def test_bad_window_raises():
+    with pytest.raises(ValueError):
+        build_query(make_turn(2), "qonly", window=0)
 
 
 def test_unknown_variant_raises():
     with pytest.raises(ValueError):
         build_query(make_turn(2), "histroy")
     with pytest.raises(ValueError):
-        build_query(make_turn(0), "histroy")  # also on turn 1, so a typo can't hide there
+        build_query(make_turn(0), "histroy")

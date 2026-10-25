@@ -2,10 +2,18 @@ import math
 
 import pytest
 
-from semeval_reteco.evaluate import evaluate, macro, write_run
+from semeval_reteco import evaluate as evaluate_module
+from semeval_reteco.evaluate import (
+    evaluate,
+    load_metrics,
+    macro,
+    read_run,
+    save_metrics,
+    summarize,
+    topic_scores,
+    write_run,
+)
 
-# q1: relevant {a, b}, ranked a, x, b      q2: relevant {c}, ranked x, y, c
-# q3 (turn 6 -> T5+): relevant {d}, nothing found
 QRELS = {"c1_turn_1": {"a": 1, "b": 1}, "c2_turn_2": {"c": 1}, "c3_turn_6": {"d": 1}}
 RUN = {
     "c1_turn_1": {"a": 3.0, "x": 2.0, "b": 1.0},
@@ -21,6 +29,7 @@ def test_hand_computed_metrics():
     assert math.isclose(res["T1"]["nDCG@10"], ndcg1)
     assert math.isclose(res["T1"]["MAP@10"], (1 + 2 / 3) / 2)
     assert math.isclose(res["T1"]["Recall@10"], 1)
+    assert math.isclose(res["all"]["Recall@100"], 2 / 3)
     assert math.isclose(res["T1"]["MRR"], 1)
     assert math.isclose(res["T2"]["nDCG@10"], ndcg2)
     assert math.isclose(res["T2"]["MAP@10"], 1 / 3)
@@ -43,7 +52,7 @@ def test_ranks_by_score_regardless_of_dict_order():
 
 def test_ties_keep_the_run_order_not_doc_id_order():
     qrels = {"c_turn_1": {"a": 1}}
-    first = {"c_turn_1": {"z": 0.0, "a": 0.0}}  # tied, z first: a is at rank 2
+    first = {"c_turn_1": {"z": 0.0, "a": 0.0}}
     last = {"c_turn_1": {"a": 0.0, "z": 0.0}}
     assert evaluate(first, qrels)["all"]["nDCG@10"] == pytest.approx(1 / math.log2(3))
     assert evaluate(last, qrels)["all"]["nDCG@10"] == 1
@@ -51,7 +60,7 @@ def test_ties_keep_the_run_order_not_doc_id_order():
 
 def test_macro_is_mean_of_domain_means():
     big = evaluate(RUN, QRELS)
-    small = evaluate({"c2_turn_2": {"c": 1.0}}, {"c2_turn_2": {"c": 1}})  # nDCG 1.0, one topic
+    small = evaluate({"c2_turn_2": {"c": 1.0}}, {"c2_turn_2": {"c": 1}})
     got = macro({"big": big, "small": small})["nDCG@10"]
     assert math.isclose(got, (big["all"]["nDCG@10"] + 1.0) / 2)
 
@@ -60,3 +69,19 @@ def test_write_run_format_and_untied_scores(tmp_path):
     write_run(tmp_path / "sub" / "r.run", {"c1_turn_1": {"a": 0.0, "b": 0.0, "c": 5.0}}, "tag")
     lines = (tmp_path / "sub" / "r.run").read_text().splitlines()
     assert lines == ["c1_turn_1\tQ0\tc\t1\t3.0\ttag", "c1_turn_1\tQ0\ta\t2\t2.0\ttag", "c1_turn_1\tQ0\tb\t3\t1.0\ttag"]
+
+
+def test_read_run_gives_back_the_same_ranking(tmp_path):
+    write_run(tmp_path / "r.run", RUN, "tag")
+    assert evaluate(read_run(tmp_path / "r.run"), QRELS) == evaluate(RUN, QRELS)
+
+
+def test_metrics_csv_round_trip(tmp_path, monkeypatch):
+    monkeypatch.setattr(evaluate_module, "METRICS_DIR", tmp_path)
+    per_topic = {("drones", "dev"): topic_scores(RUN, QRELS)}
+    save_metrics("sys", per_topic)
+    loaded = load_metrics("sys")
+    assert loaded.keys() == per_topic.keys()
+    expected = evaluate(RUN, QRELS)
+    for bucket, values in summarize(loaded["drones", "dev"]).items():
+        assert values == pytest.approx(expected[bucket], abs=1e-6)

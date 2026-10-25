@@ -1,9 +1,9 @@
-"""BM25 baseline with and without history, all domains, train and dev.
+"""BM25 baseline (k1=0.9, b=0.4) for all 11 domains, train and dev.
 
-    uv run python scripts/bm25_baseline.py
+Run: uv run python scripts/bm25_baseline.py
 
-Writes run files to results/runs/<domain>/<split>_bm25-<variant>.run (git-ignored), the
-tables to results/bm25/baseline.md and the plot to results/bm25/ndcg_by_depth.png.
+Writes run files to results/runs/, scores per turn to results/metrics/bm25-*.csv,
+and tables and a plot to results/bm25/.
 """
 import time
 
@@ -12,14 +12,21 @@ import matplotlib.pyplot as plt
 from semeval_reteco.bm25 import Bm25, run_bm25
 from semeval_reteco.config import DOMAINS, ROOT, SPLITS
 from semeval_reteco.data import load_qrels, load_turns
-from semeval_reteco.evaluate import BUCKETS, METRICS, evaluate, macro, write_run
+from semeval_reteco.evaluate import (
+    BUCKETS,
+    METRICS,
+    macro,
+    save_metrics,
+    summarize,
+    topic_scores,
+    write_run,
+)
 from semeval_reteco.queries import VARIANTS
 
 RUNS_DIR = ROOT / "results" / "runs"
 OUT = ROOT / "results" / "bm25" / "baseline.md"
 PLOT = ROOT / "results" / "bm25" / "ndcg_by_depth.png"
 
-# history and last2 use the dataset's gold answers (rule R4)
 NOTE = {"current": "current", "qonly": "q-only", "last2": "last2 (gold answers)", "history": "history (gold answers)"}
 
 
@@ -41,7 +48,8 @@ def plot_by_depth(results):
 
 
 def main():
-    results = {(v, s): {} for v in VARIANTS for s in SPLITS}  # (variant, split) -> {domain: evaluate()}
+    results = {(v, s): {} for v in VARIANTS for s in SPLITS}
+    per_topic = {v: {} for v in VARIANTS}
     for domain in DOMAINS:
         start = time.time()
         bm25 = Bm25(domain)
@@ -50,11 +58,15 @@ def main():
             for variant in VARIANTS:
                 run = run_bm25(bm25, turns, variant)
                 write_run(RUNS_DIR / domain / f"{split}_bm25-{variant}.run", run, f"bm25-{variant}")
-                results[variant, split][domain] = evaluate(run, qrels)
+                per_topic[variant][domain, split] = topic_scores(run, qrels)
+                results[variant, split][domain] = summarize(per_topic[variant][domain, split])
         print(f"{domain}: {time.time() - start:.0f}s", flush=True)
+    for variant in VARIANTS:
+        save_metrics(f"bm25-{variant}", per_topic[variant])
 
     lines = ["# BM25 baseline (official k1=0.9, b=0.4), 11 domains", "",
-        "`last2` and `history` feed the dataset's gold answers to the retriever (R4); `current` and `q-only` do not.", "",
+        "`last2` and `history` feed the dataset's gold answers to the retriever (R4); `current` and `q-only` do not.",
+        "",
         "## Macro average over domains", "",
         "| split | variant | " + " | ".join(METRICS.values()) + " |", "|---|---|" + "---|" * len(METRICS)]
     for split in ("dev", "train"):

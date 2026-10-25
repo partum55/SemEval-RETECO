@@ -1,0 +1,31 @@
+domain,qid,label,note
+biology,32_turn_1,needs reasoning,gold is a bare fact (blood osmolality 275-299 mOsm/kg) that must be compared with seawater; systems return general osmosis / salt pages
+earth_science,61_turn_1,near-duplicate wrong doc,top results are the global-warming article itself; the gold passage is one specific section among many on-topic ones
+economics,1_turn_1,near-duplicate wrong doc,both retrievers find the stochastic-dominance article but the definition section instead of the gold 'extended example' section
+hardware,ex_15078_turn_9,near-duplicate wrong doc,eight turns of RAM-upgrade talk; many RAM upgrade guides outrank the spec sheet that states the 1.2V voltage
+medicalsciences,ex_33780_turn_2,topic shift,question moves from caffeine metabolism (turn 1) to absorption speed; history keeps retrieval on birth control / metabolism
+robotics,0_turn_1,needs reasoning,gold is a launch-file code example that passes --log-level; retrievers return forum titles about the same question
+law,ex_111142_turn_1,near-duplicate wrong doc,(BM25 fails) other GAAR passages share all the query words; bge finds the gold passages on the double reasonableness test
+medicalsciences,ex_32699_turn_2,vocabulary mismatch,(BM25 fails) 'how much lead someone could eat each day' vs gold 'daily permissible lead intake'
+medicalsciences,ex_32435_turn_3,topic shift,(BM25 fails) turn moves from imaging to therapy; BM25 with history stays on x-ray / radiography documents
+politics,ex_90155_turn_1,near-duplicate wrong doc,(BM25 fails) news pages about the South Korean impeachment share the words; the gold is the comparative constitutional passage
+politics,ex_88512_turn_4,near-duplicate wrong doc,(BM25 fails) keyword-dense footnote / citation lists outrank the gold passages
+robotics,70_turn_1,near-duplicate wrong doc,(BM25 fails) Gazebo plugin tutorials outrank the gold SDF demo file of the pose publisher plugin
+biology,6_turn_2,reference / pronoun,'Is that why ...' only makes sense with turn 1; bge with history drifts (current 0.51 > history 0.14) while BM25 history finds both gold docs
+biology,11_turn_3,reference / pronoun,'those pores' refers to the coconut's three pores from earlier turns; bge returns coconut-crab and coconut-water passages
+earth_science,96_turn_4,reference / pronoun,'one year's numbers' = the annual airborne fraction from earlier turns; bge ranks the gold formula 3rd
+law,ex_111150_turn_2,annotation issue,bge's top documents answer the trademark vs copyright question about as well as the generic gold overview; likely missing qrels
+psychology,24_turn_2,topic shift,question moves from grandiose delusions to whether non-confrontation helps engagement; bge stays on delusion descriptions
+robotics,70_turn_3,near-duplicate wrong doc,bge ranks the demo file that was gold in turn 1 first; the gold here is another chunk of the same file
+biology,3_turn_10,reference / pronoun,'check things out with one eye' needs the lateralization topic from earlier turns; current alone scores 0
+biology,52_turn_4,reference / pronoun,'how our eyes work together' needs the binocular-depth context; with history both retrievers rank the gold first
+earth_science,96_turn_6,reference / pronoun,'CO2 burden' needs the airborne-fraction context of the conversation
+hardware,ex_17938_turn_3,annotation issue,question is about Xubuntu but the gold docs are about SSD and RAM (earlier turns' topic); history 'fixes' it by bringing those topics back
+law,ex_107288_turn_4,reference / pronoun,'a certain city or state' is only discrimination-related through the earlier national-origin turns
+robotics,38_turn_3,reference / pronoun,'the sensor' and 'your chassis link' refer to the NavSat plugin setup from earlier turns
+biology,5_turn_2,vocabulary mismatch,'twins with different dads' vs gold 'superfecundation'; history pulls generic twin pages
+earth_science,13_turn_2,vocabulary mismatch,'shrinking space between waves ... steeper' vs gold 'wave shoaling'; BM25 with history finds it through 'wave' + 'shallow' terms
+hardware,ex_10266_turn_2,needs reasoning,gold is a blog post with measured build times; retrievers return generic NVMe vs SATA comparisons
+law,ex_106419_turn_2,vocabulary mismatch,'what would make it okay to say no' vs the gold's 'fundamentally alter' defence (ADA Title III); dense returns employment-accommodation pages
+law,ex_106102_turn_2,annotation issue,retrieved pages on back- and forward-dating answer the question; the gold is about blank fields on EMS forms
+law,ex_105244_turn_3,needs reasoning,must know that the train-of-inquiry test was replaced by the Woolf reforms; retrievers return pages on the old test itself

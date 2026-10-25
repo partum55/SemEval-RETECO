@@ -1,14 +1,25 @@
+"""Prints one document, one conversation and one relevance line, to see what the raw data looks like.
+
+Run: uv run python scripts/inspect_data.py --domain drones
+"""
+import argparse
 import json
 
-folder = "data/reteco/track2_recor/economics/"
+from semeval_reteco.config import DATA_DIR, DOMAINS
 
-with open(folder + "documents.jsonl", encoding="utf-8") as f:
-    doc = json.loads(f.readline())
-print("Document:", doc)
 
-with open(folder + "benchmark_train.json", encoding="utf-8") as f:
-    conversations = json.load(f)
-print("Conversation:", conversations[0])
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--domain", default="economics", choices=DOMAINS)
+    folder = DATA_DIR / parser.parse_args().domain
 
-with open(folder + "qrels_train.txt", encoding="utf-8") as f:
-    print("Qrels:", repr(f.readline()))
+    with open(folder / "documents.jsonl", encoding="utf-8") as f:
+        print("Document:", json.loads(f.readline()))
+    with open(folder / "benchmark_train.json", encoding="utf-8") as f:
+        print("Conversation:", json.load(f)[0])
+    with open(folder / "qrels_train.txt", encoding="utf-8") as f:
+        print("Qrels:", repr(f.readline()))
+
+
+if __name__ == "__main__":
+    main()

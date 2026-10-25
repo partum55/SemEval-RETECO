@@ -1,7 +1,7 @@
 import pytest
 
 from semeval_reteco.config import DATA_DIR, DOMAINS
-from semeval_reteco.data import load_corpus, load_turns, load_qrels
+from semeval_reteco.data import load_corpus, load_qrels, load_turns
 
 pytestmark = pytest.mark.skipif(not DATA_DIR.exists(), reason="data not downloaded")
 
