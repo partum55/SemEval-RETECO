@@ -1,11 +1,11 @@
 # SemEval-2027 RETECO: finding documents in multi-turn conversations
 
 UCU "Artificial Intelligence" course project on [SemEval-2027 RETECO](https://github.com/DataScienceUIBK/RETECO),
-**Track 2** (RECOR data).
+Track 2 (RECOR data).
 
-A user asks a series of related questions. For every question (a *turn*) we must find the documents that help to
-answer it. The hard part: later questions depend on earlier ones. *"Is it really that easy for dirt to get in if
-there's oil on those parts?"* only makes sense if you know the conversation was about lubricating drone motors.
+A user asks a series of related questions. For every question (a turn) we must find the documents that help to
+answer it. The hard part is that later questions depend on earlier ones. "Is it really that easy for dirt to get in if
+there's oil on those parts?" only makes sense if you know the conversation was about lubricating drone motors.
 
 This repository contains the midterm work: a BM25 baseline, two pre-trained dense retrievers (MiniLM and bge-base)
 with a FAISS index, an evaluation that matches the official scorer, experiments on how to use the conversation
@@ -36,13 +36,12 @@ its domain. Data exploration: [`results/eda/`](results/eda/), [turns per depth](
 
 ## What you need
 
-- **[uv](https://docs.astral.sh/uv/)**, which installs Python 3.12 and all packages for you.
+- [uv](https://docs.astral.sh/uv/), which installs Python 3.12 and all packages for you.
   Windows: `powershell -c "irm https://astral.sh/uv/install.ps1 | iex"`. macOS/Linux: see the uv website.
-- **git**.
-- **About 2 GB of disk space**: the data is ~0.3 GB, the document vectors ~1.2 GB.
-- **A Hugging Face account in the `reteco-team` organisation** with a *Read* token, to download the shared
+- About 2 GB of disk space: the data is ~0.3 GB, the document vectors ~1.2 GB.
+- A Hugging Face account in the `reteco-team` organisation with a read token, to download the shared
   document vectors. Only needed for the dense (MiniLM, bge-base) parts.
-- **A GPU is optional.** With an NVIDIA GPU (Windows gets the CUDA build of torch automatically) or an Apple Silicon
+- A GPU is optional. With an NVIDIA GPU (Windows gets the CUDA build of torch automatically) or an Apple Silicon
   Mac, the dense steps take minutes. On a CPU everything still runs, just slower. BM25 runs on the CPU anyway.
 - On macOS, torch and faiss in one process can crash. Run with
   `OMP_NUM_THREADS=1 KMP_DUPLICATE_LIB_OK=TRUE TOKENIZERS_PARALLELISM=false`.
@@ -60,8 +59,8 @@ uv run pytest
 ```
 
 `uv run pytest` runs 38 tests; the ones that need the data or the vectors are skipped if those are not downloaded.
-The document vectors were made once with `scripts/encode_corpus.py` and shared, so you don't have to encode
-507k documents yourself.
+The document vectors were made once with `scripts/encode_corpus.py` and shared, so there is no need to encode
+507k documents again.
 
 ## How to run
 
@@ -148,9 +147,9 @@ scores per turn → averages per domain → average over the 11 domains → tabl
 1. **Load the data** for a domain.
 2. **Build the query.** Three versions, for every retriever:
    - **current**: only the current question;
-   - **q-only**: the question plus the earlier *questions* of the conversation;
-   - **history**: the question plus the earlier questions **and their answers**. This is how the official baseline
-     uses the history, but these answers are the dataset's *gold* answers, which a real system would not have.
+   - **q-only**: the question plus the earlier questions of the conversation;
+   - **history**: the question plus the earlier questions and their answers. This is how the official baseline
+     uses the history, but these answers are the dataset's gold answers, which a real system would not have.
      So q-only is the realistic setting, and we always report both.
 3. **Search.** Each retriever returns the 100 best documents.
 4. **Score** every turn and average.
@@ -169,7 +168,7 @@ scores are ordered.
 | all-MiniLM-L6-v2 | 22M parameters | 256 tokens | small, fast, a standard first dense model |
 | bge-base-en-v1.5 | 110M parameters | 512 tokens | strong retrieval model for its size, made for search queries, reads longer queries |
 
-Both are used as they are, without training ("unadapted"), as the proposal planned for the midterm. Documents were
+Both are used as they are, without training ("unadapted"). Documents were
 encoded once; at search time only the query is encoded and FAISS returns the closest documents.
 
 ## How we measure
@@ -188,10 +187,10 @@ encoded once; at search time only the query is encoded and FAISS returns the clo
 
 ## Results
 
-Dev split, macro average over the 11 domains. *Grid-selected* rows appear only where a settings search on train
+Dev split, macro average over the 11 domains. Grid-selected rows appear only where a settings search on train
 picked something other than the default.
 
-<!-- main-table -->
+
 | query | retriever | dev nDCG@10 | dev MAP@10 | dev Recall@10 | dev Recall@100 | dev MRR | train nDCG@10 |
 |---|---|---|---|---|---|---|---|
 | current | BM25 | 0.1819 | 0.1353 | 0.2782 | 0.5551 | 0.1844 | 0.1846 |
@@ -208,7 +207,7 @@ picked something other than the default.
 | history (gold answers) | MiniLM, grid-selected | 0.3474 | 0.2659 | 0.4865 | 0.8069 | 0.3697 | 0.3840 |
 | history (gold answers) | bge-base | 0.3862 | 0.3006 | 0.5398 | 0.8542 | 0.3950 | 0.4413 |
 | history (gold answers) | bge-base, grid-selected | 0.3874 | 0.3020 | 0.5407 | 0.8526 | 0.3961 | 0.4439 |
-<!-- /main-table -->
+
 
 ![nDCG@10 by turn depth](results/figures/ndcg_by_depth.png)
 
@@ -237,7 +236,7 @@ More: [all tables](results/tables/) (by depth, by domain, comparisons, context l
    except a lower b for BM25 on short queries (+0.009 for q-only, CI above 0). The bge-base instruction prefix
    matters: without it, train scores drop by 0.03–0.06.
 6. **What still fails.** 106 of 858 dev turns (12%) get nDCG@10 = 0 from all nine systems. In 30 sampled failures
-   the most common reasons are *the right page but the wrong passage* (8) and *unclear references* such as
+   the most common reasons are the right page but the wrong passage (8) and unclear references such as
    "those pores" (8), then wrong wording (4), questions that need reasoning (4), topic changes (3) and doubtful
    gold labels (3) ([error types](results/tables/error_types.md)).
 
@@ -258,9 +257,9 @@ More: [all tables](results/tables/) (by depth, by domain, comparisons, context l
 
 ## Next steps
 
-- A **cross-encoder re-ranker** (e.g. bge-reranker) over the top 100 of bge-base, BM25 and a mix of both.
+- A cross-encoder re-ranker (e.g. bge-reranker) over the top 100 of bge-base, BM25 and a mix of both.
 - Find the best way to give the conversation history to the re-ranker.
-- **Fine-tune** on the training conversations with hard negatives (wrong documents from our own top 100).
+- Fine-tune on the training conversations with hard negatives (wrong documents from our own top 100).
 - A larger error analysis with two annotators.
 
 ## Data and license
