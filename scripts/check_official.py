@@ -1,24 +1,22 @@
-"""Check our run files and our metrics against the official starter-kit tools.
+"""Checks our run files with the official format checker and scorer.
 
-    uv run python scripts/bm25_baseline.py      # writes the run files first
-    uv run python scripts/check_official.py
+Run: uv run python scripts/check_official.py   (after the run files exist)
 
-For every results/runs/<domain>/<split>_<system>.run: format_checker.py must say VALID, and
-scorer.py must give the same nDCG@10 (overall and per turn depth) as semeval_reteco.evaluate.
-The starter-kit files are downloaded once into data/starter_kit/ (git-ignored).
+Downloads the official tools into data/starter_kit/ once and prints every file that fails.
 """
 import json
+import os
 import subprocess
 import sys
 import urllib.request
 
 from semeval_reteco.config import DATA_DIR, ROOT
 from semeval_reteco.data import load_qrels
-from semeval_reteco.evaluate import BUCKETS, evaluate
+from semeval_reteco.evaluate import BUCKETS, evaluate, read_run
 
 KIT_URL = "https://raw.githubusercontent.com/DataScienceUIBK/RETECO/main/starter_kit/"
 KIT_DIR = ROOT / "data" / "starter_kit"
-TOLERANCE = 1e-4  # the official scorer rounds to 4 decimals
+TOLERANCE = 1e-4
 
 
 def fetch_starter_kit():
@@ -28,18 +26,9 @@ def fetch_starter_kit():
             urllib.request.urlretrieve(KIT_URL + name, KIT_DIR / name)
 
 
-def read_run(path):
-    run = {}
-    with open(path, encoding="utf-8") as f:
-        for line in f:
-            qid, _, doc_id, _, score, _ = line.split()
-            run.setdefault(qid, {})[doc_id] = float(score)
-    return run
-
-
 def official(script, *args):
     return subprocess.run([sys.executable, KIT_DIR / script, *map(str, args)],
-        capture_output=True, text=True, check=True).stdout
+        capture_output=True, text=True, encoding="utf-8", check=True, env=os.environ | {"PYTHONUTF8": "1"}).stdout
 
 
 def main():
