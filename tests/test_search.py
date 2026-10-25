@@ -1,3 +1,4 @@
+import faiss
 import random
 
 import pytest

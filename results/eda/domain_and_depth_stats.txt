@@ -74,3 +74,21 @@ history depth 2 -> mean: 141 -> over 256: 0% -> over 512: 0%
 history depth 3 -> mean: 252 -> over 256: 42% -> over 512: 0%
 history depth 4 -> mean: 367 -> over 256: 100% -> over 512: 0%
 history depth 5 -> mean: 487 -> over 256: 100% -> over 512: 38%
+
+Document length in tokens (MiniLM tokenizer), sample of 3000 docs per domain:
+biology -> mean: 86 -> median: 103 -> p95: 132 -> over 256: 1% -> over 512: 0%
+drones -> mean: 167 -> median: 118 -> p95: 483 -> over 256: 22% -> over 512: 4%
+earth_science -> mean: 141 -> median: 128 -> p95: 170 -> over 256: 0% -> over 512: 0%
+economics -> mean: 116 -> median: 40 -> p95: 521 -> over 256: 10% -> over 512: 5%
+hardware -> mean: 163 -> median: 108 -> p95: 492 -> over 256: 22% -> over 512: 4%
+law -> mean: 202 -> median: 158 -> p95: 505 -> over 256: 32% -> over 512: 4%
+medicalsciences -> mean: 240 -> median: 186 -> p95: 601 -> over 256: 39% -> over 512: 10%
+politics -> mean: 230 -> median: 190 -> p95: 541 -> over 256: 40% -> over 512: 7%
+psychology -> mean: 122 -> median: 41 -> p95: 365 -> over 256: 9% -> over 512: 3%
+robotics -> mean: 114 -> median: 28 -> p95: 782 -> over 256: 10% -> over 512: 6%
+sustainable_living -> mean: 105 -> median: 42 -> p95: 346 -> over 256: 9% -> over 512: 2%
+
+Word overlap between the query and its gold documents, train:
+current -> shared words per turn: 4.1 -> share of query words found in gold docs: 38%
+qonly -> shared words per turn: 9.8 -> share of query words found in gold docs: 34%
+history -> shared words per turn: 24.1 -> share of query words found in gold docs: 35%
